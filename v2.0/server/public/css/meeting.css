@@ -1,0 +1,250 @@
+html, body { height: 100%; background: #18191c; color: #e6e6e6; overflow: hidden; }
+.room { height: 100vh; display: flex; flex-direction: column; }
+
+/* top bar */
+.room-top {
+  height: 48px; background: #232427; display: flex; align-items: center; gap: 16px;
+  padding: 0 16px; font-size: 13px; border-bottom: 1px solid #2e2f33; flex-shrink: 0;
+}
+.room-top .m-title { font-weight: 600; font-size: 14px; }
+.room-top .m-id { color: #9aa0a6; cursor: pointer; }
+.room-top .m-id:hover { color: #fff; }
+.room-top .m-timer { color: #9aa0a6; font-variant-numeric: tabular-nums; }
+.room-top .spacer { flex: 1; }
+.room-top .net { display:flex; align-items:center; gap:6px; color:#9aa0a6; }
+.room-top .net b { width:8px; height:8px; border-radius:50%; background: var(--ok, #18b566); display:inline-block; }
+
+/* stage */
+.stage { flex: 1; position: relative; display: flex; min-height: 0; }
+.content { flex: 1; position: relative; min-width: 0; }
+
+.grid {
+  position:absolute; inset:0; display: grid; gap: 10px; padding: 18px;
+  grid-auto-rows: 1fr; align-content: center; justify-content: center;
+  max-width: 1500px; margin: 0 auto;
+}
+.tile {
+  position: relative; background: #2a2b2f; border-radius: 12px; overflow: hidden;
+  display:flex; align-items:center; justify-content:center; min-height: 0;
+  aspect-ratio: 16 / 9; width: 100%; max-height: 100%;
+  border: 2px solid transparent;
+}
+/* filmstrip tiles keep fixed size, not the gallery aspect ratio */
+.filmstrip .tile { aspect-ratio: auto; }
+.tile.speaking { border-color: #18b566; }
+.tile video { width: 100%; height: 100%; object-fit: cover; background:#2a2b2f; }
+.tile video.contain { object-fit: contain; background:#000; }
+.tile .avatar-big {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size: 34px; font-weight: 600; color:#fff;
+}
+.tile .avatar-big .circle { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg,#2b6fff,#2bb7ff); display:flex; align-items:center; justify-content:center; }
+.tile .tile-bar {
+  position:absolute; left: 0; bottom: 0; right: 0; padding: 6px 10px;
+  display:flex; align-items:center; gap:6px; font-size: 12px;
+  background: linear-gradient(transparent, rgba(0,0,0,.55));
+}
+.tile .tile-bar .name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tile .host-badge { background:#ff7a45; color:#fff; padding:1px 6px; border-radius: 4px; font-size:11px; }
+.mic-ico { width:16px; height:16px; display:inline-block; }
+.mic-ico.off { opacity:.9; }
+
+/* speaker / share view */
+.speaker { position:absolute; inset:0; display:flex; flex-direction:column; padding:12px; gap:8px; }
+.share-main { flex:1; position:relative; background:#000; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.share-main video { width:100%; height:100%; object-fit: contain; }
+.share-label { position:absolute; top:12px; left:14px; display:flex; align-items:center; gap:7px; background:rgba(20,40,90,.78); color:#fff; padding:7px 14px; border-radius:20px; font-size:13px; font-weight:600; z-index:6; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+.share-label::before { content:''; width:9px; height:9px; border-radius:50%; background:#18b566; box-shadow:0 0 0 0 rgba(24,181,102,.7); animation:share-pulse 1.6s infinite; }
+@keyframes share-pulse { 0%{box-shadow:0 0 0 0 rgba(24,181,102,.6)} 70%{box-shadow:0 0 0 7px rgba(24,181,102,0)} 100%{box-shadow:0 0 0 0 rgba(24,181,102,0)} }
+/* sharing badge on a participant tile (so viewers see who is sharing) */
+.tile .share-flag { position:absolute; top:8px; left:8px; display:none; align-items:center; gap:4px; background:#18b566; color:#fff; font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px; z-index:4; }
+.tile.is-sharing .share-flag { display:flex; }
+.filmstrip { height: 110px; display:flex; gap:8px; overflow-x:auto; flex-shrink:0; }
+.filmstrip .tile { width: 160px; flex-shrink:0; }
+
+/* danmu */
+.danmu-layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index: 5; }
+.danmu-item {
+  position:absolute; white-space:nowrap; font-size:18px; font-weight:600;
+  color:#fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); padding: 2px 6px;
+  animation: danmu-move linear forwards;
+}
+@keyframes danmu-move { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+
+/* share fullscreen button (viewer-controlled) */
+.share-fs { position:absolute; top:10px; right:12px; background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer; z-index:6; }
+.share-fs:hover { background:rgba(0,0,0,.8); }
+.share-main video { cursor: zoom-in; }
+.share-main:fullscreen { background:#000; }
+.share-main:fullscreen video { width:100%; height:100%; }
+
+/* speaking ring (audio level) + avatar image */
+.tile.speaking { border-color:#18b566; box-shadow: inset 0 0 0 2px #18b566; }
+.tile .avatar-big img, .member .av img, .avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.tile .avatar-big .circle { overflow:hidden; }
+
+/* invite modal */
+.invite-mask { position:fixed; inset:0; background:rgba(15,23,42,.55); display:flex; align-items:center; justify-content:center; z-index:120; backdrop-filter:blur(2px); }
+.invite-box { width:440px; background:#26282c; border:1px solid #34363c; border-radius:16px; padding:26px; color:#e6e6e6; box-shadow:0 30px 70px rgba(0,0,0,.45); }
+.invite-box h3 { font-size:18px; margin-bottom:18px; }
+.invite-row { display:flex; gap:12px; margin-bottom:12px; font-size:14px; }
+.invite-row span { color:#9aa0a6; width:72px; flex-shrink:0; }
+.invite-row b { color:#fff; }
+.invite-text { width:100%; height:96px; margin:10px 0 16px; background:#1c1d20; border:1px solid #34363c; border-radius:10px; color:#cfd2d6; font-size:13px; padding:10px; resize:none; font-family:inherit; }
+.invite-actions { display:flex; gap:12px; }
+.invite-actions .btn-ghost { flex:0 0 auto; padding:11px 18px; }
+
+/* settings modal sections */
+.set-section { margin-bottom:18px; }
+.set-label { font-size:13px; color:#9aa0a6; margin-bottom:10px; }
+.set-input { flex:1; background:#1c1d20; border:1px solid #34363c; border-radius:10px; color:#fff; padding:10px 12px; font-size:14px; }
+.set-input:focus { border-color: var(--brand,#2681ff); }
+.dt-sel { background:#1c1d20; border:1px solid #34363c; border-radius:6px; color:#fff; padding:5px 6px; font-size:13px; }
+.dt-sel:focus { border-color: var(--brand,#2681ff); outline:none; }
+.dt-sel:disabled { opacity:.45; }
+.set-note { font-size:13px; color:#9aa0a6; background:#1c1d20; border-radius:10px; padding:12px; }
+#settingsModal .host-policy { padding:0; border:none; }
+
+/* drawer */
+.drawer { width: 300px; background:#232427; border-left:1px solid #2e2f33; display:flex; flex-direction:column; flex-shrink:0; }
+.drawer-tabs { display:flex; height:46px; border-bottom:1px solid #2e2f33; }
+.drawer-tabs button { flex:1; background:none; color:#9aa0a6; font-size:14px; }
+.drawer-tabs button.active { color:#fff; border-bottom:2px solid var(--brand,#2681ff); }
+.panel { flex:1; overflow-y:auto; padding: 10px 12px; }
+.panel.hidden { display:none; }
+
+/* members */
+.member { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:8px; }
+.member:hover { background:#2c2e33; }
+.member .av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#2b6fff,#2bb7ff); display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; flex-shrink:0; }
+.member .mname { flex:1; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.member .mstat { display:flex; gap:6px; color:#9aa0a6; }
+.member .mctrl { display:none; gap:6px; }
+.member:hover .mctrl { display:flex; }
+.member .mctrl button { background:#3a3c42; color:#cfd2d6; border-radius:6px; padding:3px 8px; font-size:11px; }
+.member .mctrl button:hover { background:#4a4d54; }
+
+/* host policy bar */
+.host-policy { padding:10px 12px; border-top:1px solid #2e2f33; display:flex; flex-direction:column; gap:8px; }
+.host-policy .row { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+.switch { position:relative; width:38px; height:20px; background:#4a4d54; border-radius:20px; transition:.2s; flex-shrink:0; }
+.switch.on { background: var(--brand,#2681ff); }
+.switch::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; transition:.2s; }
+.switch.on::after { left:20px; }
+
+/* chat */
+.chat-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:10px 12px; }
+.chat-msg .who { font-size:12px; color:#9aa0a6; margin-bottom:2px; }
+.chat-msg .body { font-size:13px; background:#2c2e33; padding:7px 10px; border-radius:8px; display:inline-block; max-width:100%; word-break:break-word; }
+.chat-msg.me { align-items:flex-end; text-align:right; }
+.chat-msg.me .body { background: var(--brand,#2681ff); color:#fff; }
+.chat-input { display:flex; gap:8px; padding:10px; border-top:1px solid #2e2f33; }
+.chat-input input { flex:1; background:#2c2e33; border:none; color:#fff; padding:9px 12px; border-radius:8px; font-size:13px; }
+.chat-input button { background:var(--brand,#2681ff); color:#fff; padding:0 14px; border-radius:8px; }
+.chat-input button:disabled { opacity:.5; }
+
+/* toolbar */
+.toolbar { height: 78px; background:linear-gradient(180deg,#26282c,#1f2024); border-top:1px solid #303236; display:flex; align-items:center; justify-content:center; gap: 8px; flex-shrink:0; }
+.tbtn {
+  background:none; color:#cfd2d6; display:flex; flex-direction:column; align-items:center; gap:5px;
+  font-size:11px; padding:4px 10px; border-radius:10px; min-width:62px;
+}
+.tbtn .ic-wrap { position:relative; width:42px; height:42px; border-radius:12px; background:#34363c; display:flex; align-items:center; justify-content:center; transition:.15s; overflow:hidden; }
+/* red diagonal slash when a mic/camera button is OFF (Tencent style) */
+.tbtn.off .ic-wrap::after {
+  content:''; position:absolute; left:50%; top:50%;
+  width:150%; height:3px; background:#f5475b; border-radius:2px;
+  transform:translate(-50%,-50%) rotate(-45deg);
+  box-shadow:0 0 0 2px #34363c;
+}
+.tbtn.off svg { fill:#f5475b; }
+.tbtn:hover .ic-wrap { background:#41444b; }
+.tbtn svg { width:22px; height:22px; fill:currentColor; }
+.tbtn.active { color:#fff; }
+.tbtn.active .ic-wrap { background: var(--brand,#2681ff); }
+.tbtn.off { color:#cfd2d6; }
+.tbtn.off .ic-wrap { background:#34363c; }
+/* 禁用态：保留变暗+「禁止」光标，但【不】用 pointer-events:none——否则点击事件到不了 onclick，
+   主持人已关权限的中央提示 / 「已有人共享」toast 就永远弹不出来。各 onclick 内部已自行拦截真正的开关动作。 */
+.tbtn.disabled { opacity:.4; cursor:not-allowed; }
+.tbtn.leave .ic-wrap { background: var(--danger,#f5475b); }
+.tbtn.leave { color:#ff7d8c; }
+.tbtn.leave:hover .ic-wrap { background:#d83a4c; }
+.divider { width:1px; height:40px; background:#3a3c42; margin:0 8px; }
+
+/* toast */
+.toast { position:fixed; top:60px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; z-index:100; opacity:0; transition:opacity .25s; pointer-events:none; }
+.toast.show { opacity:1; }
+
+/* prejoin */
+.prejoin-mask { position:fixed; inset:0; background:#18191c; display:flex; align-items:center; justify-content:center; z-index:200; }
+.prejoin { width: 520px; background:#232427; border-radius:14px; padding:24px; }
+.prejoin h3 { margin-bottom:14px; }
+.prejoin .preview { aspect-ratio: 16/9; background:#000; border-radius:10px; overflow:hidden; position:relative; margin-bottom:16px; display:flex; align-items:center; justify-content:center; }
+.prejoin .preview video { width:100%; height:100%; object-fit:cover; }
+.prejoin .preview .ph { position:absolute; color:#666; }
+.prejoin .opts { display:flex; gap:12px; margin-bottom:18px; }
+.prejoin .opt { display:flex; align-items:center; gap:8px; font-size:13px; color:#cfd2d6; cursor:pointer; }
+.prejoin .join-btn { width:100%; padding:12px; background:var(--brand,#2681ff); color:#fff; border-radius:8px; font-size:15px; }
+.hidden { display:none !important; }
+
+/* 进入会议加载浮层 */
+.join-loading { position:fixed; inset:0; z-index:9998; display:flex; align-items:center; justify-content:center; background:rgba(16,17,20,.85); }
+.join-loading.hidden { display:none !important; }
+.join-loading .jl-box { display:flex; flex-direction:column; align-items:center; gap:16px; color:#e9eaed; }
+.join-loading .jl-spinner { width:46px; height:46px; border:4px solid rgba(255,255,255,.16); border-top-color:#2681ff; border-radius:50%; animation:jl-spin .8s linear infinite; }
+@keyframes jl-spin { to { transform:rotate(360deg); } }
+.join-loading .jl-title { font-size:16px; font-weight:600; }
+.join-loading .jl-id { font-size:14px; color:#9aa0a6; font-variant-numeric:tabular-nums; letter-spacing:.5px; }
+
+/* 预加入：策略禁止时置灰的选项 + 说明文字 */
+.prejoin .opt.disabled { opacity: .45; cursor: not-allowed; }
+.prejoin .pj-note {
+  margin: 8px 0 2px; padding: 8px 10px; border-radius: 8px;
+  background: rgba(245, 71, 91, .10); border: 1px solid rgba(245, 71, 91, .30);
+  color: #b9364a; font-size: 12px; line-height: 1.5; text-align: left;
+}
+
+/* ===== 窄屏（手机）适配 =====
+   原工具栏 7 个按钮各 min-width:62px + 间距 + 2 条分隔线 ≈ 532px，
+   而常见手机视口仅 360~420 CSS px，配合 justify-content:center 会把两端按钮切掉。
+   这里改为按钮等分铺满、缩小图标与字号、隐藏分隔线，保证全部可见可点。 */
+@media (max-width: 520px) {
+  .toolbar {
+    height: auto; min-height: 62px; padding: 6px 4px;
+    gap: 2px; justify-content: space-between;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .toolbar .divider { display: none; }
+  .tbtn {
+    flex: 1 1 0; min-width: 0; padding: 2px 1px;
+    font-size: 10px; gap: 3px; line-height: 1.15;
+  }
+  .tbtn .ic-wrap { width: 34px; height: 34px; border-radius: 10px; }
+  .tbtn svg { width: 18px; height: 18px; }
+  /* 「共享屏幕」原本用 <br> 强制两行，窄屏下改为一行，避免按钮变高把工具栏撑破 */
+  .tbtn > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .tbtn > span:last-child br { display: none; }
+}
+/* 超窄屏再压一档 */
+@media (max-width: 380px) {
+  .tbtn { font-size: 9px; }
+  .tbtn .ic-wrap { width: 30px; height: 30px; }
+  .tbtn svg { width: 16px; height: 16px; }
+}
+
+/* 窄屏顶栏：360px 视口下「标题 / 会议号 / 计时 / 网络」会各自溢出盒子、文字糊成一团。
+   缩小字号与间距、标题超长省略、其余不收缩，即可在 360px 内完整排下。 */
+@media (max-width: 520px) {
+  .room-top { height: 44px; gap: 8px; padding: 0 10px; font-size: 12px; }
+  .room-top .m-title {
+    flex: 0 1 auto; min-width: 0; max-width: 5em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .room-top .m-id, .room-top .m-timer { flex: 0 0 auto; white-space: nowrap; }
+  .room-top .net { flex: 0 0 auto; white-space: nowrap; gap: 4px; }
+}
+@media (max-width: 380px) {
+  .room-top { font-size: 11px; gap: 6px; }
+  .room-top .net span { display: none; }   /* 极窄屏只保留状态圆点 */
+}

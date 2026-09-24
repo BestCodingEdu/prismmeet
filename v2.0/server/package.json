@@ -1,0 +1,26 @@
+{
+  "name": "prismmeet-server",
+  "version": "1.0.1",
+  "description": "PrismMeet — open-source Tencent-Meeting-like video conferencing (signaling + auth + web client)",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@alicloud/credentials": "^2.4.1",
+    "@alicloud/dypnsapi20170525": "2.0.0",
+    "@alicloud/openapi-client": "^0.4.15",
+    "@alicloud/tea-typescript": "^1.0.0",
+    "@alicloud/tea-util": "^1.4.9",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "livekit-server-sdk": "^2.16.0",
+    "nanoid": "^5.0.7",
+    "nodemailer": "^9.0.1",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,34 @@
+# ---------- 依赖 ----------
+**/node_modules/
+
+# ---------- 运行时数据（账号、会议记录，属本地/服务器数据，不入库）----------
+**/server/data/
+
+# ---------- 环境变量 / 密钥 ----------
+**/.env
+.env.*
+**/config.env
+*.secret
+*.secrets
+
+# ---------- 可选的服务端扩展：src/ext/*.js 存在时会被自动挂载，内容按部署自行添加 ----------
+**/server/src/ext/
+
+# ---------- 构建产物 ----------
+**/dist/
+**/dist-pkg/
+**/desktop/build-info.json
+**/desktop/build/gen-icon.mjs
+**/desktop/build/icon-src.png
+*.zip
+
+# ---------- 日志 ----------
+*.log
+npm-debug.log*
+
+# ---------- 操作系统 ----------
+.DS_Store
+Thumbs.db
+
+# 提示：含【中间斜杠】的模式（如 server/data/）只锚定到仓库根目录，
+#      要在任意层级生效请一律写成 **/ 开头。

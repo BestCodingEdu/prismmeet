@@ -1,0 +1,14 @@
+<!doctype html><meta charset=utf-8><title>WAIT</title>
+<body><div id=s>init</div>
+<script type=module>
+import { Room, RoomEvent } from '/js/vendor/livekit-client.esm.js';
+const q=new URLSearchParams(location.search);
+const url=q.get('url')||'ws://127.0.0.1:7880', token=q.get('token');
+const s=document.getElementById('s');
+const room=new Room({adaptiveStream:true,dynacast:true});
+let got=false;
+room.on(RoomEvent.TrackSubscribed,(t,pub,p)=>{got=true;document.title='SUBSCRIBED';s.textContent='SUBSCRIBED '+t.kind+' from '+p.identity;});
+room.on(RoomEvent.Disconnected,()=>{if(!got){document.title='DISCONNECTED';s.textContent='disconnected';}});
+try{ await room.connect(url,token); document.title=got?'SUBSCRIBED':'CONNECTED'; s.textContent='connected, waiting track…'; }
+catch(e){ document.title='ERROR'; s.textContent='ERR '+(e&&e.message||e); }
+</script></body>

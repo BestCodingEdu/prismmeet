@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会议中 · PrismMeet</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/meeting.css" />
+</head>
+<body>
+  <!-- browser gate (shown when NOT running in desktop app) -->
+  <div id="browserGate" class="prejoin-mask hidden" style="flex-direction:column;gap:0;">
+    <div class="prejoin" style="text-align:center;width:440px;">
+      <div style="font-size:46px;margin-bottom:6px;">🖥️</div>
+      <h3 style="font-size:20px;">请使用 PrismMeet 桌面客户端加入会议</h3>
+      <p style="color:#9aa0a6;font-size:14px;margin:14px 0 22px;">为获得屏幕共享、低延迟音视频等完整体验，会议需在桌面客户端中进行。</p>
+      <button class="join-btn" id="gateOpen">打开 PrismMeet 客户端</button>
+      <a id="gateDownload" class="join-btn" style="display:block;margin-top:10px;background:#3a3c42;text-decoration:none;">下载桌面客户端</a>
+      <p style="color:#6b7079;font-size:12px;margin-top:16px;">已安装客户端？点击上方按钮即可自动唤起。</p>
+    </div>
+  </div>
+
+  <!-- prejoin -->
+  <div id="prejoin" class="prejoin-mask hidden">
+    <div class="prejoin">
+      <h3 id="pjTitle">加入会议</h3>
+      <div class="preview">
+        <video id="pjVideo" autoplay playsinline muted></video>
+        <div class="ph" id="pjPh">摄像头已关闭</div>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" id="pjMic" /> 入会开启麦克风</label>
+        <label class="opt"><input type="checkbox" id="pjCam" /> 入会开启摄像头</label>
+      </div>
+      <button class="join-btn" id="pjJoin">进入会议</button>
+    </div>
+  </div>
+
+  <div class="room hidden" id="room">
+    <header class="room-top">
+      <div class="m-title" id="topTitle">会议</div>
+      <div class="m-id" id="topId" title="点击复制会议号">会议号: —</div>
+      <div class="m-timer" id="topTimer">00:00</div>
+      <div class="spacer"></div>
+      <div class="net"><b></b><span id="topNet">网络正常</span></div>
+    </header>
+
+    <main class="stage">
+      <div class="content">
+        <div id="grid" class="grid"></div>
+        <div id="speaker" class="speaker hidden">
+          <div class="share-main">
+            <video id="shareVideo" autoplay playsinline></video>
+            <div class="share-label" id="shareLabel"></div>
+            <button id="shareFsBtn" class="share-fs" title="放大 / 全屏（仅自己可见）">⛶ 放大</button>
+          </div>
+          <div id="filmstrip" class="filmstrip"></div>
+        </div>
+        <div id="danmu" class="danmu-layer"></div>
+      </div>
+
+      <aside id="drawer" class="drawer hidden">
+        <div class="drawer-tabs">
+          <button id="tabMembers" class="active">成员 (<span id="memCount">1</span>)</button>
+          <button id="tabChat">聊天</button>
+        </div>
+        <div id="membersPanel" class="panel">
+          <div id="memberList"></div>
+        </div>
+        <div id="chatPanel" class="panel hidden" style="display:flex;flex-direction:column;padding:0;">
+          <div id="chatList" class="chat-list"></div>
+          <div class="chat-input">
+            <input id="chatText" placeholder="发送消息（将以弹幕显示）" maxlength="200" />
+            <button id="chatSend">发送</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="toolbar">
+      <button class="tbtn off" id="btnMic">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V6a3 3 0 00-6 0v5a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0H3a9 9 0 008 8.94V23h2v-3.06A9 9 0 0021 11z"/></svg></span>
+        <span id="micLabel">开启麦克风</span>
+      </button>
+      <button class="tbtn off" id="btnCam">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M15 8l5-3v14l-5-3v2a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1h10a1 1 0 011 1z"/></svg></span>
+        <span id="camLabel">开启摄像头</span>
+      </button>
+      <div class="divider"></div>
+      <button class="tbtn" id="btnShare">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8l-3 3h2v3h2v-3h2z"/><path d="M8 20h8v-2H8z"/></svg></span>
+        <span>共享<br>屏幕</span>
+      </button>
+      <button class="tbtn" id="btnMembers">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 10-4-4 4 4 0 004 4zm-8 0a4 4 0 10-4-4 4 4 0 004 4zm0 2c-2.7 0-8 1.34-8 4v3h8v-3c0-1 .4-1.9 1.1-2.7A12 12 0 008 13zm8 0c-.3 0-.6 0-1 .05C18.2 14 20 15.3 20 17v3h4v-3c0-2.66-5.3-4-8-4z"/></svg></span>
+        <span>成员</span>
+      </button>
+      <button class="tbtn" id="btnChat">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M4 4h16a1 1 0 011 1v12a1 1 0 01-1 1H8l-4 4V5a1 1 0 011-1z"/></svg></span>
+        <span>聊天</span>
+      </button>
+      <button class="tbtn" id="btnInvite">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M15 12a4 4 0 10-4-4 4 4 0 004 4zm0 2c-3 0-9 1.5-9 4.5V21h13v-1a5.9 5.9 0 00.2-1.5C19.2 15.5 17 14 15 14z"/><path d="M5 9V6H3v3H0v2h3v3h2v-3h3V9z"/></svg></span>
+        <span>邀请</span>
+      </button>
+      <button class="tbtn" id="btnSettings">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.8 7.8 0 000-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1l-.4-2.5h-4l-.4 2.5a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L4.6 11a7.8 7.8 0 000 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 001.7 1l.4 2.5h4l.4-2.5a7.6 7.6 0 001.7-1l2.4 1 2-3.4zM12 15a3 3 0 110-6 3 3 0 010 6z"/></svg></span>
+        <span>设置</span>
+      </button>
+      <div class="divider"></div>
+      <button class="tbtn leave" id="btnLeave">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3z"/><path d="M20 3h-9a2 2 0 00-2 2v3h2V5h9v14h-9v-3H9v3a2 2 0 002 2h9a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg></span>
+        <span>离开</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- invite modal -->
+  <div id="inviteModal" class="invite-mask hidden">
+    <div class="invite-box">
+      <h3>邀请参会者</h3>
+      <div class="invite-row"><span>会议主题</span><b id="invTitle">—</b></div>
+      <div class="invite-row"><span>会议号</span><b id="invId">—</b></div>
+      <div class="invite-row"><span>邀请链接</span><a id="invLink" href="#" style="color:#2bb7ff;word-break:break-all;font-size:13px;">—</a></div>
+      <textarea id="invText" class="invite-text" readonly></textarea>
+      <div class="invite-actions">
+        <button class="btn-ghost" id="invClose">关闭</button>
+        <button class="btn-primary" id="invCopy" style="flex:1;width:auto;">复制邀请信息</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- settings modal -->
+  <div id="settingsModal" class="invite-mask hidden">
+    <div class="invite-box">
+      <h3>会议设置</h3>
+      <!-- everyone: temporary nickname for this meeting -->
+      <div class="set-section">
+        <div class="set-label">本次会议昵称（仅本会议生效，不改账号昵称）</div>
+        <div style="display:flex;gap:10px;">
+          <input id="setNameInput" class="set-input" type="text" maxlength="24" placeholder="输入临时昵称" />
+          <button class="btn-primary" id="setNameBtn" style="width:auto;flex:0 0 auto;padding:0 18px;margin:0;">保存</button>
+        </div>
+      </div>
+      <!-- host only: meeting permissions -->
+      <div id="setHost" class="set-section hidden">
+        <div class="set-label">主持人权限控制</div>
+        <div id="hostPolicy" class="host-policy">
+          <div class="row"><span>允许参与者开麦克风</span><div class="switch on" data-pol="allowMic"></div></div>
+          <div class="row"><span>允许参与者开摄像头</span><div class="switch on" data-pol="allowCam"></div></div>
+          <div class="row"><span>允许聊天 / 弹幕</span><div class="switch on" data-pol="allowDanmu"></div></div>
+          <div class="row"><span>锁定会议（禁止新成员）</span><div class="switch" data-pol="locked"></div></div>
+          <button class="btn-ghost" id="muteAllBtn" style="margin-top:8px;width:100%;">全体静音</button>
+        </div>
+        <div class="set-label" style="margin-top:16px;">入会限制（仅约束参会者，你不受限）</div>
+        <div class="host-policy">
+          <div class="row" style="display:block;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="optTimeOn"> 设置参会开始时间（不勾=随时可进）</label>
+            <div style="margin-top:8px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;font-size:13px;color:#cfd2d6;">
+              <input type="number" id="optYear" class="dt-sel" style="width:70px;" /> 年
+              <select id="optMonth" class="dt-sel"></select> 月
+              <select id="optDay" class="dt-sel"></select> 日
+              <select id="optHour" class="dt-sel"></select> 时
+              <select id="optMin" class="dt-sel"></select> 分
+            </div>
+          </div>
+          <div class="row" style="display:block;margin-top:10px;"><span>人数上限（最少 1 人，留空=不限）</span>
+            <input type="number" id="optMaxP" min="1" class="set-input" placeholder="不限" style="width:100%;margin-top:6px;text-align:left;" />
+          </div>
+          <div class="set-note" style="margin-top:8px;">以上「开始时间 / 人数上限」在点击下方「完成」后生效。</div>
+        </div>
+      </div>
+      <div id="setReadonly" class="set-note hidden">会议权限由主持人控制。</div>
+      <div class="invite-actions" style="margin-top:18px;">
+        <button class="btn-primary" id="setClose" style="flex:1;width:auto;">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- 进入会议加载浮层 -->
+  <div id="joinLoading" class="join-loading hidden">
+    <div class="jl-box">
+      <div class="jl-spinner"></div>
+      <div class="jl-title">正在进入会议…</div>
+      <div class="jl-id" id="jlId"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/meeting.js"></script>
+</body>
+</html>

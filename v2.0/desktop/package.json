@@ -1,0 +1,67 @@
+{
+  "name": "prismmeet-desktop",
+  "version": "2.0.2",
+  "description": "PrismMeet 棱镜会议 桌面客户端（v2.0 LiveKit SFU）",
+  "author": "PrismGlory",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "set PM_DEV=1&& electron .",
+    "build-info": "node build/gen-build-info.mjs",
+    "pack:win": "npm run build-info && electron-packager . PrismMeet --platform=win32 --arch=x64 --out=dist-pkg --overwrite --extra-resource=../server/public --app-version=2.0.2",
+    "dist": "electron-builder --win --x64",
+    "dist:mac": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.0.1",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "org.prismglory.meeting",
+    "productName": "PrismMeet",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "picker.html"
+    ],
+    "extraResources": [
+      {
+        "from": "../server/public",
+        "to": "public"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "PrismMeet-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "PrismMeet"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.business",
+      "artifactName": "PrismMeet-${version}.${ext}"
+    },
+    "protocols": [
+      {
+        "name": "PrismMeet",
+        "schemes": [
+          "prismmeet"
+        ]
+      }
+    ]
+  }
+}
